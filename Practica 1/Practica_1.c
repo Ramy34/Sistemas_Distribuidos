@@ -1,129 +1,204 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/time.h>
-#include <time.h>
 
-void get_walltime(double* wcTime){
-  struct timeval tp;
-  gettimeofday(&tp, NULL);
-  *wcTime=(tp.tv_sec + tp.tv_usec/1000000.0);
+void get_walltime(double* wcTime) {
+	struct timeval tp;
+	gettimeofday(&tp, NULL);
+	*wcTime = (tp.tv_sec + tp.tv_usec/1000000.0);
+
 }
 
-int main(int argc, char*argv[]){
-	int i=0;
-	int j=0;
-	int k=0;
-	int n=3;
-	int **matrizA;
-	int **matrizB;
-	int **matrizR;
-	double S1; 
-	double E1;
+int main(int argc, char* argv[]) {
+	//Variables para los ciclos for, y el tamano de las matrices
+	int i, j,k,n;
+	//Variables extras
+	int a,tamano[7] = {3,100,250,500,750,1000,1500};
+	//Creacion de las matrices
+	int **matrizA, **matrizB, **matrizC;
+	//Variables para el calculo de tiempo
+	double S1,E1;
 	
-	srand(time(NULL));
-	
-		
-	/*Creando matrices*/
-	matrizA= (int **)malloc(n*sizeof(int*));
-	for(i=0; i<n; i++){
-		*(matrizA+i) = (int *)malloc(n*sizeof(int));
-	}
-	
-	matrizB= (int **)malloc(n*sizeof(int*));
-	for(i=0; i<n; i++){
-		*(matrizB+i) = (int *)malloc(n*sizeof(int));
-	}
-	
-	matrizR= (int **)malloc(n*sizeof(int*));
-	for(i=0; i<n; i++){
-		*(matrizR+i) = (int *)malloc(n*sizeof(int));
-	}
-	
-	/***Llena matrices***/
-	for(i=0; i<n; i++){
-		for(j=0; j<n; j++){
-			matrizA[i][j]= rand() % 6;
-		}	
-	}
-
-	for(i=0; i<n; i++){
-		for(j=0; j<n; j++){
-			matrizB[i][j] = rand() % 6;				
-		}
-	}
-	get_walltime(&S1);
-	
-	/*Imprime matrices*/
-	printf("Matriz A\n");
-	for(i=0;i<n;i++){
-		for (j=0; j<n; j++){
-			printf("%d", matrizA[i][j]);
-			printf("\t");
-		}
-		printf("\n");
-	}
-	printf("\n");
-	printf("Matriz B\n");
-	for(i=0;i<n;i++){
-		for (j=0; j<n; j++){
-			printf("%d", matrizB[i][j]);
-			printf("\t");
-		}
-		printf("\n");
-	}
-	printf("\n");
-
-	/*Multiplica matrices*/
-
-	for(i=0; i<n; i++){
-		for(j=0; j<n; j++){
-			//matrizR[i][j]=0;
-			for(k=0; k<n; k++){
-				matrizR[i][j] += matrizA[i][k] * matrizB[k][j]; 
-			}
-		}	
-	}
-	get_walltime(&E1);
-	
-	for(i=0;i<n;i++){
-		for (j=0; j<n; j++){
-			printf("%d", matrizR[i][j]);
-			printf("\t");
-		}
-		printf("\n");
-	}
-
-	printf("Tiempo metodo ijk: %f s\n", (E1-S1));
-	
-	
-	printf("Segunda iteración\n");
-	matrizR = (int **)malloc(n * sizeof(int *));
+	for(a = 0; a < 1; a++){
+		n = tamano[a];
+		printf("Matriz de %d * %d\n",n,n);
+		//Inicializando matrices
+		matrizA = (int **)malloc(n * sizeof(int *));
+		matrizB = (int **)malloc(n * sizeof(int *));
+		matrizC = (int **)malloc(n * sizeof(int *));
 		for (i = 0; i < n; i++) {
-			*(matrizR + i) = (int *)malloc(n * sizeof(int *));
+			*(matrizA + i) = (int *)malloc(n * sizeof(int *));
+			*(matrizB + i) = (int *)malloc(n * sizeof(int *));
+			*(matrizC + i) = (int *)malloc(n * sizeof(int *));
 		}
-	
-	for(i=0; i<n; i++){
-		for(k=0; k<n; k++){
-			//matrizR[i][k]=0;
-			for(j=0; j<n; j++){
-				matrizR[i][j] += matrizA[i][k] * matrizB[k][j]; 
+		//Llenado de matrices
+		for (i = 0; i < n; i++) {
+			for (j = 0; j < n; j++) {
+				matrizA[i][j] = rand() % 6;
+				matrizB[i][j] = rand() % 6;
 			}
-		}	
-	}
-	get_walltime(&E1);
-	
-	for(i=0;i<n;i++){
-		for (j=0; j<n; j++){
-			printf("%d", matrizR[i][j]);
-			printf("\t");
 		}
-		printf("\n");
-	}
-	printf("Tiempo metodo ikj: %f s\n", (E1-S1));
-	//printf("Tiempo metodo jik: %f s\n", (E1-S1));
-	//printf("Tiempo metodo jki: %f s\n", (E1-S1));
-	//printf("Tiempo metodo kij: %f s\n", (E1-S1));
-	//printf("Tiempo metodo kji: %f s\n", (E1-S1));
+		
+		printf("Terminé de llenar las matrices :)\n");
+		printf("Matriz A\n");
+		for(i=0;i<n;i++){
+			for (j=0;j<n;j++){
+				printf("%d ",matrizA[i][j]);
+			}
+			printf("\n");
+		}
+		printf("Matriz B\n");
+		for(i=0;i<n;i++){
+			for (j=0;j<n;j++){
+				printf("%d ",matrizB[i][j]);
+			}
+			printf("\n");
+		}
+		
+		//Primera combinacion
+		get_walltime(&S1);
+		for (i = 0; i < n; i++) {
+			for (j = 0; j < n; j++) {
+				for (k = 0; k < n; k++) {
+					matrizC[i][j] += matrizA[i][k] * matrizB[k][j];
+				}
+			}
+		}
+		get_walltime(&E1);
+		printf("1)Tiempo método ijk: %f s\n", (E1 - S1));
+		
+		for(i=0;i<n;i++){
+			for (j=0;j<n;j++){
+				printf("%d ",matrizC[i][j]);
+			}
+			printf("\n");
+		}
+		
+		matrizC = (int **)malloc(n * sizeof(int *));
+		for (i = 0; i < n; i++) {
+			*(matrizC + i) = (int *)malloc(n * sizeof(int *));
+		}
+		
+		//Segunda combinacion
+		get_walltime(&S1);
+		for (i = 0; i < n; i++) {
+			for (k = 0; k < n; k++) {
+				for (j = 0; j < n; j++) {
+					matrizC[i][j] += matrizA[i][k] * matrizB[k][j];
+				}
+			}
+		}
+		get_walltime(&E1);
+		printf("2)Tiempo método ikj: %f s\n", (E1 - S1));
+		
+		for(i=0;i<n;i++){
+			for (j=0;j<n;j++){
+				printf("%d ",matrizC[i][j]);
+			}
+			printf("\n");
+		}
+		
+		matrizC = (int **)malloc(n * sizeof(int *));
+		for (i = 0; i < n; i++) {
+			*(matrizC + i) = (int *)malloc(n * sizeof(int *));
+		}
 	
-	return 0; 	
+		//Tercera combinacion
+		get_walltime(&S1);
+		for (j = 0; j < n; j++) {
+			for (i = 0; i < n; i++) {
+				for (k = 0; k < n; k++) {
+					matrizC[i][j] += matrizA[i][k] * matrizB[k][j];
+				}
+			}
+		}
+		get_walltime(&E1);
+		printf("3)Tiempo método jik: %f s\n", (E1 - S1));		
+		
+		for(i=0;i<n;i++){
+			for (j=0;j<n;j++){
+				printf("%d ",matrizC[i][j]);
+			}
+			printf("\n");
+		}
+		
+		matrizC = (int **)malloc(n * sizeof(int *));
+		for (i = 0; i < n; i++) {
+			*(matrizC + i) = (int *)malloc(n * sizeof(int *));
+		}
+		
+		//Cuarta combinacion
+		get_walltime(&S1);
+		for (j = 0; j < n; j++) {
+			for (k = 0; k < n; k++) {
+				for (i = 0; i < n; i++) {
+					matrizC[i][j] += matrizA[i][k] * matrizB[k][j];
+				}
+			}
+		}
+		get_walltime(&E1);
+		printf("4)Tiempo método jki: %f s\n", (E1 - S1));
+		
+		for(i=0;i<n;i++){
+			for (j=0;j<n;j++){
+				printf("%d ",matrizC[i][j]);
+			}
+			printf("\n");
+		}
+		
+		matrizC = (int **)malloc(n * sizeof(int *));
+		for (i = 0; i < n; i++) {
+			*(matrizC + i) = (int *)malloc(n * sizeof(int *));
+		}
+		
+		//Quinta combinacion
+		get_walltime(&S1);
+		for (k = 0; k < n; k++) {
+			for (i = 0; i < n; i++) {
+				for (j = 0; j < n; j++) {
+					matrizC[i][j] += matrizA[i][k] * matrizB[k][j];
+				}
+			}
+		}
+		get_walltime(&E1);
+		printf("5)Tiempo método kij: %f s\n", (E1 - S1));
+		
+		for(i=0;i<n;i++){
+			for (j=0;j<n;j++){
+				printf("%d ",matrizC[i][j]);
+			}
+			printf("\n");
+		}
+		
+		matrizC = (int **)malloc(n * sizeof(int *));
+		for (i = 0; i < n; i++) {
+			*(matrizC + i) = (int *)malloc(n * sizeof(int *));
+		}
+		
+		//Sexta combinacion
+		get_walltime(&S1);
+		for (k = 0; k < n; k++) {
+			for (j = 0; j < n; j++) {
+				for (i = 0; i < n; i++) {
+					matrizC[i][j] += matrizA[i][k] * matrizB[k][j];
+				}
+			}
+		}
+		get_walltime(&E1);
+		printf("6)Tiempo método kji: %f s\n", (E1 - S1));
+		
+		for(i=0;i<n;i++){
+			for (j=0;j<n;j++){
+				printf("%d ",matrizC[i][j]);
+			}
+			printf("\n");
+		}
+		
+		matrizC = (int **)malloc(n * sizeof(int *));
+		for (i = 0; i < n; i++) {
+			*(matrizC + i) = (int *)malloc(n * sizeof(int *));
+		}
+	}
+	
+	return 0;
 }
